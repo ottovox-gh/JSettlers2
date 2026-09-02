@@ -3084,6 +3084,33 @@ public class SOCGameHandler extends GameHandler
                     } else if (ga.clientVersionLowest >= SOCDevCardAction.VERSION_FOR_MULTIPLE) {
                         // clients are all 2.0 or newer
                         srv.messageToGame(gname, true, dcaMsg);
+
+                        // vvvvvvvvvvvvvvv BEGIN GEMINI SUGGESTED BUGFIX !!!!!!!!!!!!!!!!
+                        // Clear out the visual "ghost" unknown cards from the client UI
+                        int numVPCardsRevealed = vpCardsITypes.size();
+
+                        // Figure out which version of UNKNOWN the current game environment expects
+                        final boolean cliVersionRecent = (ga.clientVersionLowest >= SOCDevCardConstants.VERSION_FOR_RENUMBERED_TYPES);
+                        final int unknownType = (cliVersionRecent)
+                            ? SOCDevCardConstants.UNKNOWN
+                            : SOCDevCardConstants.UNKNOWN_FOR_VERS_1_X;
+
+                        // Create a message telling the client to REMOVE the generic unknown cards
+                        final SOCDevCardAction removeUnknownMsg = new SOCDevCardAction(
+                            gname,
+                            pn,
+                            SOCDevCardAction.REMOVE_OLD,
+                            unknownType
+                        );
+
+                        // Fire the remove message once for each card revealed
+                        for (int j = 0; j < numVPCardsRevealed; j++) {
+                            if (ga.clientVersionLowest >= SOCDevCardAction.VERSION_FOR_MULTIPLE) {
+                                srv.messageToGame(gname, true, removeUnknownMsg);
+                            }
+                        }
+                        // ^^^^^^^^^^^^^^^  END  GEMINI SUGGESTED BUGFIX !!!!!!!!!!!!!!!!
+
                     } else {
                         // mixed versions:
                         // v2.0.00 and newer clients will announce this with localized text;
