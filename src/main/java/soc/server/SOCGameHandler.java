@@ -3105,9 +3105,7 @@ public class SOCGameHandler extends GameHandler
 
                         // Fire the remove message once for each card revealed
                         for (int j = 0; j < numVPCardsRevealed; j++) {
-                            if (ga.clientVersionLowest >= SOCDevCardAction.VERSION_FOR_MULTIPLE) {
-                                srv.messageToGame(gname, true, removeUnknownMsg);
-                            }
+                            srv.messageToGame(gname, true, removeUnknownMsg);
                         }
                         // ^^^^^^^^^^^^^^^  END  GEMINI SUGGESTED BUGFIX !!!!!!!!!!!!!!!!
 
