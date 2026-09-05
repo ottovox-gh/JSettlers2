@@ -3074,6 +3074,14 @@ public class SOCGameHandler extends GameHandler
                     final SOCDevCardAction dcaMsg = new SOCDevCardAction
                         (gname, pn, SOCDevCardAction.ADD_OLD, vpCardsITypes);
 
+                    List<Integer> unknowns = new ArrayList<Integer>();
+                    for (int j = 0; j < vpCardsITypes.size(); j++) {
+                        unknowns.add(SOCDevCardConstants.UNKNOWN);
+                    }
+                    // Create a message telling the client to REMOVE the generic unknown cards
+                    final SOCDevCardAction removeUnknownMsg = new SOCDevCardAction(
+                        gname, pn, SOCDevCardAction.REMOVE_OLD, unknowns);
+
                     if (joiningConn != null)
                     {
                         if (joiningConn.getVersion() >= SOCDevCardAction.VERSION_FOR_MULTIPLE)
@@ -3085,29 +3093,8 @@ public class SOCGameHandler extends GameHandler
                         // clients are all 2.0 or newer
                         srv.messageToGame(gname, true, dcaMsg);
 
-                        // vvvvvvvvvvvvvvv BEGIN GEMINI SUGGESTED BUGFIX !!!!!!!!!!!!!!!!
                         // Clear out the visual "ghost" unknown cards from the client UI
-                        int numVPCardsRevealed = vpCardsITypes.size();
-
-                        // Figure out which version of UNKNOWN the current game environment expects
-                        final boolean cliVersionRecent = (ga.clientVersionLowest >= SOCDevCardConstants.VERSION_FOR_RENUMBERED_TYPES);
-                        final int unknownType = (cliVersionRecent)
-                            ? SOCDevCardConstants.UNKNOWN
-                            : SOCDevCardConstants.UNKNOWN_FOR_VERS_1_X;
-
-                        // Create a message telling the client to REMOVE the generic unknown cards
-                        final SOCDevCardAction removeUnknownMsg = new SOCDevCardAction(
-                            gname,
-                            pn,
-                            SOCDevCardAction.REMOVE_OLD,
-                            unknownType
-                        );
-
-                        // Fire the remove message once for each card revealed
-                        for (int j = 0; j < numVPCardsRevealed; j++) {
-                            srv.messageToGame(gname, true, removeUnknownMsg);
-                        }
-                        // ^^^^^^^^^^^^^^^  END  GEMINI SUGGESTED BUGFIX !!!!!!!!!!!!!!!!
+                        srv.messageToGame(gname, true, removeUnknownMsg);
 
                     } else {
                         // mixed versions:
@@ -3121,6 +3108,8 @@ public class SOCGameHandler extends GameHandler
                             new SOCGameTextMsg(gname, SOCServer.SERVERNAME, txt), true);
                         srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, Integer.MAX_VALUE,
                             dcaMsg, true);
+                        srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, Integer.MAX_VALUE,
+                            removeUnknownMsg, true);
                         srv.recordGameEvent(gname, dcaMsg);
                     }
                 } else {
