@@ -100,6 +100,13 @@ public class SOCDevCardAction extends SOCMessage
     public static final int VERSION_FOR_BUY_OMITS_GE_DEV_CARD_COUNT = 2500;
 
     /**
+     * Minimum version (2.7.00) of server and client where dev cards can be removed
+     * from player's inventory ({@link #REMOVE_NEW}, {@link #REMOVE_OLD}).
+     * @since 2.7.00
+     */
+    public static final int VERSION_FOR_REMOVE = 2700;
+
+    /**
      * Maximum number of cards to send in a reasonable message: 100.
      * @since 2.0.00
      */
@@ -143,14 +150,16 @@ public class SOCDevCardAction extends SOCMessage
 
     /**
      * dev card action: Remove new card from player's hand.
-     * Used for Undo actions which were added in v2.7.00, so older clients won't encounter it.
+     * Used for Undo actions which were added in v2.7.00 ({@link #VERSION_FOR_REMOVE});
+     * older clients will ignore it.
      * @since 2.7.00
      */
     public static final int REMOVE_NEW = 5;
 
     /**
      * dev card action: Remove old card from player's hand.
-     * Used for Undo actions which were added in v2.7.00, so older clients won't encounter it.
+     * Used for Undo actions which were added in v2.7.00 ({@link #VERSION_FOR_REMOVE});
+     * older clients will ignore it.
      * @since 2.7.00
      */
     public static final int REMOVE_OLD = 6;
