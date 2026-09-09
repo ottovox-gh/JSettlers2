@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -3074,10 +3075,10 @@ public class SOCGameHandler extends GameHandler
                     final SOCDevCardAction dcaMsg = new SOCDevCardAction
                         (gname, pn, SOCDevCardAction.ADD_OLD, vpCardsITypes);
 
-                    List<Integer> unknowns = new ArrayList<Integer>();
-                    for (int j = 0; j < vpCardsITypes.size(); j++) {
-                        unknowns.add(SOCDevCardConstants.UNKNOWN);
-                    }
+                    // game over, unknown cards representing player's KEPT victoryPoints will be removed before
+                    // known victory points are added, same number unknowns removed as victoryPoints added
+                    List<Integer> unknowns = Collections.nCopies(vpCardsITypes.size(), SOCDevCardConstants.UNKNOWN);
+
                     // Create a message telling the client to REMOVE the generic unknown cards
                     final SOCDevCardAction removeUnknownMsg = new SOCDevCardAction(
                         gname, pn, SOCDevCardAction.REMOVE_OLD, unknowns);
@@ -3091,11 +3092,10 @@ public class SOCGameHandler extends GameHandler
                         //    don't send them to a 1.x client
                     } else if (ga.clientVersionLowest >= SOCDevCardAction.VERSION_FOR_MULTIPLE) {
                         // clients are all 2.0 or newer
-                        srv.messageToGame(gname, true, dcaMsg);
-
                         // Clear out the visual "ghost" unknown cards from the client UI
                         srv.messageToGame(gname, true, removeUnknownMsg);
-
+                        // devCardAction: add victory point cards to clients inventory
+                        srv.messageToGame(gname, true, dcaMsg);
                     } else {
                         // mixed versions:
                         // v2.0.00 and newer clients will announce this with localized text;
@@ -3106,10 +3106,12 @@ public class SOCGameHandler extends GameHandler
                                 // I18N OK: Pre-2.0.00 clients always use english
                         srv.messageToGameForVersions(ga, 0, SOCDevCardAction.VERSION_FOR_MULTIPLE - 1,
                             new SOCGameTextMsg(gname, SOCServer.SERVERNAME, txt), true);
-                        srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, Integer.MAX_VALUE,
-                            dcaMsg, true);
+                        // modern versions remove unknown cards in preparation for known victory points
                         srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, Integer.MAX_VALUE,
                             removeUnknownMsg, true);
+                        // modern versions add victory points to client inventory
+                        srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, Integer.MAX_VALUE,
+                            dcaMsg, true);
                         srv.recordGameEvent(gname, dcaMsg);
                     }
                 } else {
