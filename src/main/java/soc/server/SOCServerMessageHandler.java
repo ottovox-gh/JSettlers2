@@ -2719,7 +2719,9 @@ public class SOCServerMessageHandler
                         ? new SOCStatusMessage
                             (SOCStatusMessage.SV_GAME_STARTED_CANNOT_SIT_CLIENT_VERSION,
                              gaName + SOCMessage.sep2_char + sitVers + SOCMessage.sep2_char + txt)
-                        : new SOCGameServerText(gaName, txt);
+                        : ((cliVers >= SOCGameServerText.VERSION_FOR_GAMESERVERTEXT)
+                           ? new SOCGameServerText(gaName, txt)
+                           : new SOCGameTextMsg(gaName, SOCServer.SERVERNAME, txt));
                     srv.messageToPlayer
                         (c, gaName, SOCServer.PN_OBSERVER, msg);
 
