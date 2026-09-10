@@ -3107,7 +3107,7 @@ public class SOCGameHandler extends GameHandler
                                 // I18N OK: Pre-2.0.00 clients always use english
                         srv.messageToGameForVersions(ga, 0, SOCDevCardAction.VERSION_FOR_MULTIPLE - 1,
                             new SOCGameTextMsg(gname, SOCServer.SERVERNAME, txt), true);
-                        // very modern versions remove unknown cards in preparation for known victory points
+                        // v2.7 or newer can remove unknown cards in preparation for known victory points
                         // to fix "game over vp count inflation bug" present in earlier v2 games
                         srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_REMOVE, Integer.MAX_VALUE,
                             removeUnknownMsg, true);
