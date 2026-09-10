@@ -3069,10 +3069,20 @@ public class SOCGameHandler extends GameHandler
                 if ((ga.clientVersionHighest >= SOCDevCardAction.VERSION_FOR_MULTIPLE) || (joiningConn != null))
                 {
                     List<Integer> vpCardsITypes = new ArrayList<Integer>();
-                    for (SOCInventoryItem i : vpCards)
+                    // since game is over, unknown cards representing player's KEPT victoryPoints will be removed
+                    // before victory points are added, same number unknowns removed as victoryPoints added
+                    List<Integer> unknowns = new ArrayList<Integer>();
+
+                    for (SOCInventoryItem i : vpCards) {
                         vpCardsITypes.add(Integer.valueOf(i.itype));
+                        unknowns.add(SOCDevCardConstants.UNKNOWN);
+                    }
                     final SOCDevCardAction dcaMsg = new SOCDevCardAction
                         (gname, pn, SOCDevCardAction.ADD_OLD, vpCardsITypes);
+
+                    // Create a message telling the client to REMOVE the generic unknown cards
+                    final SOCDevCardAction removeUnknownMsg = new SOCDevCardAction(
+                        gname, pn, SOCDevCardAction.REMOVE_OLD, unknowns);
 
                     if (joiningConn != null)
                     {
@@ -3081,8 +3091,11 @@ public class SOCGameHandler extends GameHandler
                         // else:
                         //    Server v1.x never sent these to a client joining a game after it ends;
                         //    don't send them to a 1.x client
-                    } else if (ga.clientVersionLowest >= SOCDevCardAction.VERSION_FOR_MULTIPLE) {
-                        // clients are all 2.0 or newer
+                    } else if (ga.clientVersionLowest >= SOCDevCardAction.VERSION_FOR_REMOVE) {
+                        // clients are all 2.7 or newer
+                        // Clear out the visual "ghost" unknown cards from the client UI
+                        srv.messageToGame(gname, true, removeUnknownMsg);
+                        // devCardAction: add victory point cards to clients inventory
                         srv.messageToGame(gname, true, dcaMsg);
                     } else {
                         // mixed versions:
@@ -3094,6 +3107,23 @@ public class SOCGameHandler extends GameHandler
                                 // I18N OK: Pre-2.0.00 clients always use english
                         srv.messageToGameForVersions(ga, 0, SOCDevCardAction.VERSION_FOR_MULTIPLE - 1,
                             new SOCGameTextMsg(gname, SOCServer.SERVERNAME, txt), true);
+                        // v2.7 or newer can remove unknown cards in preparation for known victory points
+                        // to fix "game over vp count inflation bug" present in earlier v2 games
+                        srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_REMOVE, Integer.MAX_VALUE,
+                            removeUnknownMsg, true);
+                        srv.recordGameEvent(gname, removeUnknownMsg);
+                        if (ga.clientVersionHighest >= SOCDevCardAction.VERSION_FOR_MULTIPLE)
+                        {
+                            // remove unknowns at v2.0 - v2.6 clients;
+                            // can't send SOCDevCardAction(PLAY, List) so send several messages
+                            final SOCMessage playUnknown = new SOCDevCardAction
+                                (gname, pn, SOCDevCardAction.PLAY, SOCDevCardConstants.UNKNOWN);
+                            for (@SuppressWarnings("unused") SOCInventoryItem i : vpCards)
+                                srv.messageToGameForVersions
+                                    (ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, SOCDevCardAction.VERSION_FOR_REMOVE - 1,
+                                     playUnknown, true);
+                        }
+                        // v2 versions add victory points to client inventory
                         srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, Integer.MAX_VALUE,
                             dcaMsg, true);
                         srv.recordGameEvent(gname, dcaMsg);
