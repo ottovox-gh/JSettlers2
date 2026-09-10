@@ -49,6 +49,7 @@ JARs for recent JSettlers versions can be downloaded from
 	        - If hasn't made trades of a type, show "None" instead of all 0s
 	        - 2:1 ports: Show as `4 -> (0, 0, 0, 1, 1)` instead of `(0, 0, 4, 0, 0) -> ...`
 	    - Statistics dialog shows client player's resource rolls and trades
+	    - Bugfix: At end of game, when revealing VP cards in players' hand panels, don't increase their dev card count (thanks Streeper for bugfix PR #126)
 	    - Bugfix: When observing game and it ends or is deleted, don't show "x seats available" overlay
 	    - Bugfix when Window Close button clicked: Don't hide the window if user wants to continue playing or reset board
 	      (thanks KotCzarny for reporting github issue #103)

@@ -4969,7 +4969,9 @@ public class TestActionsMessages
                 {"all:SOCGameElements:", "|e4=" + PN_WIN},  // CURRENT_PLAYER
                 {"all:SOCGameState:", "|state=1000"},
                 {"all:SOCGameServerText:", "|text=>>> " + plName + " has won the game with 10 points."},
+                {"all:SOCDevCardAction:", "|playerNum=" + PN_OTHER_NONWIN_PLAYER + "|actionType=REMOVE_OLD|cardType=0"},
                 {"all:SOCDevCardAction:", "|playerNum=" + PN_OTHER_NONWIN_PLAYER + "|actionType=ADD_OLD|cardType=4"},
+                {"all:SOCDevCardAction:", "|playerNum=" + PN_WIN + "|actionType=REMOVE_OLD|cardTypes=[0, 0, 0, 0, 0]"},
                 {"all:SOCDevCardAction:", "|playerNum=" + PN_WIN + "|actionType=ADD_OLD|cardTypes=[6, 6, 6, 6, 6]"},
                 {"all:SOCGameStats:",
                    ((clientWin) ? "|0|3|2|10" : "|0|3|10|2")

@@ -715,7 +715,9 @@ Preceding messages are:
 Those are part of the previous sequence if it typically ends with a SOCGameState.
 
 - all:SOCGameServerText:game=test|text=>>> p3 has won the game with 10 points.
+- all:SOCDevCardAction:game=test|playerNum=2|actionType=REMOVE_OLD|cardType=0
 - all:SOCDevCardAction:game=test|playerNum=2|actionType=ADD_OLD|cardType=6
+- all:SOCDevCardAction:game=test|playerNum=3|actionType=REMOVE_OLD|cardTypes=[0, 0]
 - all:SOCDevCardAction:game=test|playerNum=3|actionType=ADD_OLD|cardTypes=[5, 4]
 - all:SOCGameStats:game=test|0|0|3|10|false|false|false|false
 - all:SOCGameServerText:game=test|text=This game was 12 rounds, and took 11 minutes 29 seconds.
