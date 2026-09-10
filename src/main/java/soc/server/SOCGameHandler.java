@@ -3111,7 +3111,19 @@ public class SOCGameHandler extends GameHandler
                         // to fix "game over vp count inflation bug" present in earlier v2 games
                         srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_REMOVE, Integer.MAX_VALUE,
                             removeUnknownMsg, true);
-                        // modern versions add victory points to client inventory
+                        srv.recordGameEvent(gname, removeUnknownMsg);
+                        if (ga.clientVersionHighest >= SOCDevCardAction.VERSION_FOR_MULTIPLE)
+                        {
+                            // remove unknowns at v2.0 - v2.6 clients;
+                            // can't send SOCDevCardAction(PLAY, List) so send several messages
+                            final SOCMessage playUnknown = new SOCDevCardAction
+                                (gname, pn, SOCDevCardAction.PLAY, SOCDevCardConstants.UNKNOWN);
+                            for (@SuppressWarnings("unused") SOCInventoryItem i : vpCards)
+                                srv.messageToGameForVersions
+                                    (ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, SOCDevCardAction.VERSION_FOR_REMOVE - 1,
+                                     playUnknown, true);
+                        }
+                        // v2 versions add victory points to client inventory
                         srv.messageToGameForVersions(ga, SOCDevCardAction.VERSION_FOR_MULTIPLE, Integer.MAX_VALUE,
                             dcaMsg, true);
                         srv.recordGameEvent(gname, dcaMsg);
